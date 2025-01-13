@@ -1,4 +1,4 @@
-# 📱 Event Manager - Frontend
+# 📱 Gerenciador de Eventos - Frontend Native
 
 Aplicativo móvel para gerenciamento de eventos desenvolvido em React Native. Permite que administradores gerenciem seus eventos de forma simples e intuitiva.
 
