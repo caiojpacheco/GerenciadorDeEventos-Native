@@ -1,0 +1,157 @@
+import { useState } from "react";
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from "react-native";
+import axios from "axios";
+import Loading from "../../components/loading/Loading";
+
+const CadastroScreen = () => {
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const URL = "https://67847eea1ec630ca33a49221.mockapi.io/cadastro";
+
+  const Cadastro = async () => {
+    if (!nome || !email || !senha || !confirmarSenha) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos.");
+      return;
+    }
+
+    if (senha !== confirmarSenha) {
+      Alert.alert("Erro", "As senhas não coincidem. Tente novamente.");
+      return;
+    }
+
+    Alert.alert("Confirmação", "Você deseja realizar o cadastro?", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Ok",
+        onPress: async () => {
+          setLoading(true);
+          try {
+            const userData = { nome, email, senha };
+            const response = await axios.post(URL, userData);
+
+            if (response.status === 201) {
+              setMessage("Cadastro realizado com sucesso!");
+            } else {
+              setMessage("Erro ao cadastrar. Verifique os dados.");
+            }
+          } catch (error: any) {
+            if (error.response) {
+              setMessage(error.response.data.message || "Erro no cadastro.");
+            } else {
+              setMessage("Erro na comunicação com o servidor.");
+            }
+          } finally {
+            setLoading(false);
+          }
+        },
+      },
+    ]);
+  };
+
+  return (
+    <View style={styles.container}>
+      <Image
+        source={require("../../../assets/logo.webp")}
+        style={styles.image}
+      />
+      <Text style={styles.titulo}>Cadastre-se</Text>
+      <Text style={styles.subTitulo}>Crie sua conta para continuar</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nome"
+        value={nome}
+        onChangeText={setNome}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Senha"
+        value={senha}
+        onChangeText={setSenha}
+        secureTextEntry
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Confirmar Senha"
+        value={confirmarSenha}
+        onChangeText={setConfirmarSenha}
+        secureTextEntry
+      />
+      <TouchableOpacity style={styles.button} onPress={Cadastro}>
+        <Text style={styles.buttonText}>Cadastrar</Text>
+      </TouchableOpacity>
+      {message ? <Text style={styles.message}>{message}</Text> : null}
+      <Loading visible={loading} />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#111111",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  image: {
+    width: "100%",
+    height: 150,
+    resizeMode: "contain",
+  },
+  titulo: {
+    fontSize: 32,
+    color: "#FFF",
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  subTitulo: {
+    fontSize: 18,
+    color: "#DDD",
+    marginBottom: 20,
+  },
+  input: {
+    width: "85%",
+    height: 50,
+    backgroundColor: "#FFF",
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 15,
+  },
+  message: { marginTop: 10, color: "white" },
+  button: {
+    width: "85%",
+    height: 50,
+    backgroundColor: "grey",
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    fontSize: 18,
+    color: "#FFF",
+    fontWeight: "bold",
+  },
+});
+
+export default CadastroScreen;
